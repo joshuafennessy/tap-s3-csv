@@ -258,7 +258,7 @@ def sampling_gz_file(table_spec, s3_bucket, s3_path, file_handle, sample_rate, e
             return []
 
         s3_bucket = config['bucket']
-        file_handle = get_file_handle(config, file_key)
+        file_handle = get_file_handle(config, s3_path)
 
         LOGGER.debug(f"s3_bucket: {s3_bucket}")
         LOGGER.debug(f"s3_path: {s3_path}")
@@ -402,6 +402,14 @@ def sample_files(config, table_spec, s3_files,
                     s3_path,
                     max_records,
                     sample_rate)
+
+        LOGGER.debug(f"s3_bucket: {s3_bucket}")
+        LOGGER.debug(f"s3_path: {s3_path}")
+        LOGGER.debug(f"file_handle: {file_handle}")
+        LOGGER.debug(f"sample_rate: {sample_rate}")
+        LOGGER.debug(f"extension: {extension}")
+        LOGGER.debug(f"config: {config}")
+        
         try:
             yield from itertools.islice(sample_file(table_spec, s3_bucket, s3_path, file_handle, sample_rate, extension, config), max_records)
         except (UnicodeDecodeError,json.decoder.JSONDecodeError):
