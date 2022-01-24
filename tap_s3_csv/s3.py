@@ -231,7 +231,7 @@ def check_key_properties_and_date_overrides_for_jsonl_file(table_spec, jsonl_sam
                             .format(s3_path, date_overrides - all_keys))
 
 #pylint: disable=global-statement
-def sampling_gz_file(table_spec, s3_path, file_handle, sample_rate, config):
+def sampling_gz_file(table_spec, s3_bucket, s3_path, file_handle, file_key, sample_rate, extension, config):
     global skipped_files_count
     if s3_path.endswith(".tar.gz"):
         LOGGER.warning('Skipping "%s" file as .tar.gz extension is not supported',s3_path)
@@ -257,13 +257,17 @@ def sampling_gz_file(table_spec, s3_path, file_handle, sample_rate, config):
             skipped_files_count = skipped_files_count + 1
             return []
 
+        s3_bucket = config['bucket']
+        file_handle = get_file_handle(config, file_key)
+
         gz_file_extension = gz_file_name.split(".")[-1].lower()
-        return sample_file(table_spec, s3_path + "/" + gz_file_name, io.BytesIO(gz_file_obj.read()), sample_rate, gz_file_extension, config)
+        #return sample_file(table_spec, s3_path + "/" + gz_file_name, io.BytesIO(gz_file_obj.read()), sample_rate, gz_file_extension, config)
+        return sample_file(table_spec, s3_bucket, s3_path, file_handle, file_key, sample_rate, extension, config)
 
     raise Exception('"{}" file has some error(s)'.format(s3_path))
 
 #pylint: disable=global-statement
-def sample_file(table_spec, s3_bucket, s3_path, file_handle, sample_rate, extension, config):
+def sample_file(table_spec, s3_bucket, s3_path, file_handle, file_key, sample_rate, extension, config):
     global skipped_files_count
 
     # Check whether file is without extension or not
@@ -283,7 +287,7 @@ def sample_file(table_spec, s3_bucket, s3_path, file_handle, sample_rate, extens
             skipped_files_count = skipped_files_count + 1
         return csv_records
     if extension == "gz":
-        return sampling_gz_file(table_spec, s3_path, file_handle, sample_rate, config)
+        return sampling_gz_file(table_spec, s3_bucket, s3_path, file_handle, file_key, sample_rate, extension, config)
     if extension == "jsonl":
         # If file object read from s3 bucket file else use extracted file object from zip or gz
         file_handle = file_handle._raw_stream if hasattr(file_handle, "_raw_stream") else file_handle
