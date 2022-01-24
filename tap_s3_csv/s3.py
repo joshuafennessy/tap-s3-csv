@@ -262,11 +262,12 @@ def sampling_gz_file(table_spec, s3_bucket, s3_path, file_handle, sample_rate, e
 
         LOGGER.debug(f"s3_bucket: {s3_bucket}")
         LOGGER.debug(f"s3_path: {s3_path}")
-        LOGGER.debug(f"file_handle: {file_handle}")
+        LOGGER.debug(f"file_handle: {s3_path}/{gz_file_name}")
 
         gz_file_extension = gz_file_name.split(".")[-1].lower()
+
         #return sample_file(table_spec, s3_path + "/" + gz_file_name, io.BytesIO(gz_file_obj.read()), sample_rate, gz_file_extension, config)
-        return sample_file(table_spec, s3_bucket, s3_path, file_handle, sample_rate, extension, config)
+        return sample_file(table_spec, s3_bucket, f"{s3_path}/{gz_file_name}", io.BytesIO(gz_file_obj.read()), sample_rate, gz_file_extension, config)
 
     raise Exception('"{}" file has some error(s)'.format(s3_path))
 
