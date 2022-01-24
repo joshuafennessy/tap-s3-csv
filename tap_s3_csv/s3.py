@@ -260,6 +260,10 @@ def sampling_gz_file(table_spec, s3_bucket, s3_path, file_handle, file_key, samp
         s3_bucket = config['bucket']
         file_handle = get_file_handle(config, file_key)
 
+        LOGGER.debug(f"s3_bucket: {s3_bucket}")
+        LOGGER.debug(f"s3_path: {s3_path}")
+        LOGGER.debug(f"file_handle: {file_handle}")
+
         gz_file_extension = gz_file_name.split(".")[-1].lower()
         #return sample_file(table_spec, s3_path + "/" + gz_file_name, io.BytesIO(gz_file_obj.read()), sample_rate, gz_file_extension, config)
         return sample_file(table_spec, s3_bucket, s3_path, file_handle, file_key, sample_rate, extension, config)
